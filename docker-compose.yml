@@ -1,0 +1,20 @@
+services:
+  backend:
+    build:
+      context: ./Back
+      dockerfile: Dockerfile
+    ports:
+      - "${BACK_PORT}:3000"
+    environment:
+      - PORT=3000
+
+  frontend:
+    build:
+      context: ./Front
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL}
+    ports:
+      - "${FRONT_PORT}:80"
+    depends_on:
+      - backend

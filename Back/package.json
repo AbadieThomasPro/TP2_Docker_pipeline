@@ -1,0 +1,13 @@
+{
+  "name": "tp2-backend",
+  "version": "1.0.0",
+  "description": "Mini backend Express pour le TP2 Docker Pipeline",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
+  }
+}
