@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: CI Pipeline
 
 on:
   push:
@@ -24,13 +24,32 @@ jobs:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Tag metadata for backend
+        id: meta-backend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ vars.DOCKERHUB_USERNAME }}/tp2-backend
+          tags: |
+            type=raw,value=latest
+            type=sha,format=short
+
       - name: Build and push backend image
         uses: docker/build-push-action@v6
         with:
           context: ./Back
           file: ./Back/Dockerfile
           push: true
-          tags: ${{ vars.DOCKERHUB_USERNAME }}/tp2-backend:latest
+          tags: ${{ steps.meta-backend.outputs.tags }}
+          labels: ${{ steps.meta-backend.outputs.labels }}
+
+      - name: Tag metadata for frontend
+        id: meta-frontend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ vars.DOCKERHUB_USERNAME }}/tp2-frontend
+          tags: |
+            type=raw,value=latest
+            type=sha,format=short
 
       - name: Build and push frontend image
         uses: docker/build-push-action@v6
@@ -40,4 +59,5 @@ jobs:
           push: true
           build-args: |
             VITE_API_URL=${{ vars.VITE_API_URL }}
-          tags: ${{ vars.DOCKERHUB_USERNAME }}/tp2-frontend:latest
+          tags: ${{ steps.meta-frontend.outputs.tags }}
+          labels: ${{ steps.meta-frontend.outputs.labels }}
