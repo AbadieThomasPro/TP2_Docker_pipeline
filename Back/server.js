@@ -4,8 +4,6 @@ const cors = require('cors');
 const app = express();
 app.use(cors());
 
-const PORT = process.env.PORT || 3000;
-
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });
@@ -14,6 +12,11 @@ app.get('/api/message', (req, res) => {
   res.json({ message: 'Hello from the backend!' });
 });
 
-app.listen(PORT, () => {
-  console.log(`Backend listening on port ${PORT}`);
-});
+if (require.main === module) {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Backend listening on port ${PORT}`);
+  });
+}
+
+module.exports = app;

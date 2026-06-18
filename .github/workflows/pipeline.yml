@@ -6,8 +6,67 @@ on:
   workflow_dispatch:
 
 jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install backend dependencies
+        run: npm ci
+        working-directory: ./Back
+
+      - name: Lint backend
+        run: npm run lint
+        working-directory: ./Back
+
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: ./Front
+
+      - name: Lint frontend
+        run: npm run lint
+        working-directory: ./Front
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install backend dependencies
+        run: npm ci
+        working-directory: ./Back
+
+      - name: Run backend tests
+        run: npm test
+        working-directory: ./Back
+
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: ./Front
+
+      - name: Run frontend tests
+        run: npm test
+        working-directory: ./Front
+
   build-and-push:
     name: Build & push Docker images
+    needs: [lint, test]
     runs-on: ubuntu-latest
     environment: dev
 
