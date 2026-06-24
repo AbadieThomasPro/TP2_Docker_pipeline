@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, waitFor, cleanup } from '@testing-library/react';
+import { render, screen, waitFor, cleanup, fireEvent } from '@testing-library/react';
 import App from './App.jsx';
 
 beforeEach(() => {
@@ -20,8 +20,14 @@ describe('App', () => {
     expect(screen.getByText('TP2 - Docker Pipeline')).toBeTruthy();
   });
 
-  it('displays the message fetched from the backend', async () => {
+  it('does not call the backend until the button is clicked', () => {
     render(<App />);
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  it('displays the message fetched from the backend after clicking the button', async () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole('button'));
     await waitFor(() => {
       expect(screen.getByText('Hello from the backend!')).toBeTruthy();
     });
@@ -39,8 +45,9 @@ describe('App', () => {
     );
 
     render(<App />);
+    fireEvent.click(screen.getByRole('button'));
     await waitFor(() => {
-      expect(screen.getByText('backend-replica-1')).toBeTruthy();
+      expect(screen.getAllByText('backend-replica-1').length).toBeGreaterThan(0);
     });
   });
 });
