@@ -120,3 +120,39 @@ jobs:
             VITE_API_URL=${{ vars.VITE_API_URL }}
           tags: ${{ steps.meta-frontend.outputs.tags }}
           labels: ${{ steps.meta-frontend.outputs.labels }}
+
+  deploy:
+    name: Deploy to Docker Swarm
+    needs: [build-and-push]
+    runs-on: ubuntu-latest
+    environment: dev
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Compute image tag
+        id: image-tag
+        run: echo "tag=sha-$(echo ${{ github.sha }} | cut -c1-7)" >> "$GITHUB_OUTPUT"
+
+      - name: Copy stack file to manager
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.GCP_MANAGER_HOST }}
+          username: ${{ secrets.GCP_SSH_USER }}
+          key: ${{ secrets.GCP_SSH_PRIVATE_KEY }}
+          source: "docker-stack.yml"
+          target: "~/tp2"
+
+      - name: Deploy stack on manager
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.GCP_MANAGER_HOST }}
+          username: ${{ secrets.GCP_SSH_USER }}
+          key: ${{ secrets.GCP_SSH_PRIVATE_KEY }}
+          script: |
+            export DOCKERHUB_USERNAME=${{ vars.DOCKERHUB_USERNAME }}
+            export IMAGE_TAG=${{ steps.image-tag.outputs.tag }}
+            cd ~/tp2
+            docker stack deploy -c docker-stack.yml tp2
+            docker service ls

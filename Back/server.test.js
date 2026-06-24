@@ -13,4 +13,5 @@ test('GET /api/message returns the welcome message', async () => {
   const res = await request(app).get('/api/message');
   assert.strictEqual(res.status, 200);
   assert.strictEqual(res.body.message, 'Hello from the backend!');
+  assert.strictEqual(typeof res.body.instance, 'string');
 });

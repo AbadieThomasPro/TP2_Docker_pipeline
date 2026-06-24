@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const os = require('os');
 
 const app = express();
 app.use(cors());
@@ -9,7 +10,7 @@ app.get('/api/health', (req, res) => {
 });
 
 app.get('/api/message', (req, res) => {
-  res.json({ message: 'Hello from the backend!' });
+  res.json({ message: 'Hello from the backend!', instance: os.hostname() });
 });
 
 if (require.main === module) {

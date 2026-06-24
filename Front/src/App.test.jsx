@@ -26,4 +26,21 @@ describe('App', () => {
       expect(screen.getByText('Hello from the backend!')).toBeTruthy();
     });
   });
+
+  it('displays the backend instance when present in the response', async () => {
+    global.fetch = vi.fn(() =>
+      Promise.resolve({
+        json: () =>
+          Promise.resolve({
+            message: 'Hello from the backend!',
+            instance: 'backend-replica-1',
+          }),
+      })
+    );
+
+    render(<App />);
+    await waitFor(() => {
+      expect(screen.getByText('backend-replica-1')).toBeTruthy();
+    });
+  });
 });

@@ -1,0 +1,38 @@
+services:
+  backend:
+    image: ${DOCKERHUB_USERNAME}/tp2-backend:${IMAGE_TAG:-latest}
+    environment:
+      - PORT=3000
+    networks:
+      - app-net
+    ports:
+      - target: 3000
+        published: 3000
+        mode: ingress
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: any
+      update_config:
+        parallelism: 1
+        order: start-first
+
+  frontend:
+    image: ${DOCKERHUB_USERNAME}/tp2-frontend:${IMAGE_TAG:-latest}
+    networks:
+      - app-net
+    ports:
+      - target: 80
+        published: 8080
+        mode: ingress
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: any
+      update_config:
+        parallelism: 1
+        order: start-first
+
+networks:
+  app-net:
+    driver: overlay
